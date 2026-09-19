@@ -7,6 +7,11 @@
 	"authors": [
 		"ToolLeprechaun"
 	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/hoes-are-scythes",
+		"sources": "https://github.com/TAH24/hoes-are-scythes",
+		"issues": "https://github.com/TAH24/hoes-are-scythes/issues"
+	},
 	"license": "MIT",
 	"icon": "assets/hoesarescythes/hoes-are-scythes-icon.png",
 	"environment": "*",
@@ -19,6 +24,9 @@
 		],
 		"fabric-datagen": [
 			"net.taylor.hoesarescythes.HoesAreScythesDataGenerator"
+		],
+		"modmenu": [
+			"net.taylor.hoesarescythes.client.ModMenuIntegration"
 		]
 	},
 	"depends": {
@@ -26,5 +34,9 @@
 		"minecraft": ">=26.1 <26.4",
 		"java": ">=25",
 		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*",
+		"cloth-config": "*"
 	}
 }

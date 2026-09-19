@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +24,8 @@ public final class ConfigManager {
     /** Vanilla hoes and their default radius. Used for new config files, missing entries, and as the fallback. */
     public static final Map<String, Integer> DEFAULT_HOES = defaultHoes();
 
-    private static ModConfig CURRENT = new ModConfig();
+    // volatile: the config screen saves on the client thread while the (integrated) server thread reads it.
+    private static volatile ModConfig CURRENT = new ModConfig();
 
     private ConfigManager() {}
 
@@ -46,15 +48,34 @@ public final class ConfigManager {
             String json = Files.readString(p);
             ModConfig cfg = GSON.fromJson(json, ModConfig.class);
             if (cfg == null) cfg = new ModConfig();
-            if (cfg.hoes == null) cfg.hoes = new ArrayList<>();
-            if (cfg.extraScythableBlocks == null) cfg.extraScythableBlocks = new ArrayList<>();
-            if (addMissingDefaultHoes(cfg)) {
+            if (normalize(cfg)) {
                 write(p, cfg);
             }
             CURRENT = cfg;
         } catch (Exception e) {
             System.err.println("[HoesAreScythes] Failed to read config, keeping previous: " + e.getMessage());
         }
+    }
+
+    // Writes the config to disk and applies it immediately (used by the Mod Menu config screen).
+    public static void save(ModConfig cfg) {
+        normalize(cfg);
+        write(path(), cfg);
+        CURRENT = cfg;
+    }
+
+    /** The vanilla hoes as config entries, in default order. */
+    public static List<ModConfig.HEntry> defaultHoeEntries() {
+        List<ModConfig.HEntry> entries = new ArrayList<>();
+        DEFAULT_HOES.forEach((id, radius) -> entries.add(entry(id, radius)));
+        return entries;
+    }
+
+    // Fills in missing lists and vanilla hoes. Returns true if anything was added.
+    private static boolean normalize(ModConfig cfg) {
+        if (cfg.hoes == null) cfg.hoes = new ArrayList<>();
+        if (cfg.extraScythableBlocks == null) cfg.extraScythableBlocks = new ArrayList<>();
+        return addMissingDefaultHoes(cfg);
     }
 
     // Appends vanilla hoes the file doesn't list yet (e.g. copper hoes for configs made before they existed).

@@ -1,0 +1,16 @@
+{
+	"config.hoesarescythes.title": "Hoes Are Scythes",
+	"config.hoesarescythes.category.general": "General",
+	"config.hoesarescythes.server_note": "These settings apply to singleplayer and worlds you host. On a multiplayer server, the server's own config file is used.",
+	"config.hoesarescythes.vanilla_hoe.tooltip": "Clearing radius in blocks (0–16). 0 turns this hoe off.",
+	"config.hoesarescythes.other_hoes": "Other hoes",
+	"config.hoesarescythes.other_hoes.tooltip": "Modded hoes or #tags, one per line, then the radius (0–16).\ne.g. othermod:steel_hoe = 3 or #c:hoes = 3\nA specific item always wins over a #tag.",
+	"config.hoesarescythes.other_hoes.hint": "e.g. othermod:steel_hoe = 3",
+	"config.hoesarescythes.extra_blocks": "Extra scythable blocks",
+	"config.hoesarescythes.extra_blocks.tooltip": "Blocks or #tags a hoe should also clear.\ne.g. minecraft:fern or #minecraft:flowers",
+	"config.hoesarescythes.extra_blocks.hint": "e.g. minecraft:fern or #minecraft:flowers",
+	"config.hoesarescythes.error.hoe_format": "Use: item = radius",
+	"config.hoesarescythes.error.id": "Not a valid ID",
+	"config.hoesarescythes.error.vanilla_hoe": "Set vanilla hoes in their own field above",
+	"config.hoesarescythes.error.radius": "Radius must be a whole number from 0 to 16"
+}

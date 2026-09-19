@@ -17,13 +17,15 @@ public final class RadiusResolver {
     public static int getRadius(ItemStack stack) {
         if (stack == null) return 0;
 
-        // 1) Config-defined entries (first match wins)
+        // 1) Config-defined entries: a specific item wins over a tag, then first match wins
         ModConfig cfg = ConfigManager.get();
         for (ModConfig.HEntry e : cfg.hoes) {
-            if (e.item != null && idEquals(stack.getItem(), e.item)) {
+            if (e != null && e.item != null && idEquals(stack.getItem(), e.item)) {
                 return clamp(e.radius);
             }
-            if (e.tag != null && e.tag.startsWith("#") && isInItemTag(stack, e.tag.substring(1))) {
+        }
+        for (ModConfig.HEntry e : cfg.hoes) {
+            if (e != null && e.tag != null && e.tag.startsWith("#") && isInItemTag(stack, e.tag.substring(1))) {
                 return clamp(e.radius);
             }
         }
