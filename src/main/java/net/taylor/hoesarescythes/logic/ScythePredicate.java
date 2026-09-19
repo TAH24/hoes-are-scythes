@@ -3,7 +3,7 @@ package net.taylor.hoesarescythes.logic;
 import net.taylor.hoesarescythes.config.ConfigManager;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,7 +24,7 @@ public final class ScythePredicate {
 
             // Tag entry: "#namespace:path"
             if (entry.startsWith("#")) {
-                ResourceLocation tagId = ResourceLocation.tryParse(entry.substring(1));
+                Identifier tagId = Identifier.tryParse(entry.substring(1));
                 if (tagId == null) {
                     HoesAreScythes.LOGGER.debug("Ignoring invalid scythable tag '{}'", entry);
                     continue;
@@ -35,7 +35,7 @@ public final class ScythePredicate {
             }
 
             // Single block id: "namespace:path"
-            ResourceLocation id = ResourceLocation.tryParse(entry);
+            Identifier id = Identifier.tryParse(entry);
             if (id == null) {
                 HoesAreScythes.LOGGER.debug("Ignoring invalid scythable id '{}'", entry);
                 continue;

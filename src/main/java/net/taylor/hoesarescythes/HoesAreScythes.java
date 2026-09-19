@@ -4,7 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.taylor.hoesarescythes.config.ConfigManager;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.minecraft.server.packs.PackType;
 import net.taylor.hoesarescythes.config.ConfigReloadListener;
 
@@ -21,7 +21,7 @@ public class HoesAreScythes implements ModInitializer {
 		LOGGER.info("Config loaded from {}", ConfigManager.path());
 
 		// Enable /reload support
-		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new ConfigReloadListener());
+		ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(ConfigReloadListener.ID, new ConfigReloadListener());
 
 		// existing registration
 		ClearGrass.register();

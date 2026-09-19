@@ -1,16 +1,13 @@
 package net.taylor.hoesarescythes.config;
 
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.taylor.hoesarescythes.HoesAreScythes;
 
-public final class ConfigReloadListener implements SimpleSynchronousResourceReloadListener {
+public final class ConfigReloadListener implements ResourceManagerReloadListener {
 
-    @Override
-    public ResourceLocation getFabricId() {
-        return ResourceLocation.fromNamespaceAndPath(HoesAreScythes.MOD_ID, "config_reload");
-    }
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(HoesAreScythes.MOD_ID, "config_reload");
 
     @Override
     public void onResourceManagerReload(ResourceManager manager) {
