@@ -1,9 +1,9 @@
 package net.taylor.hoesarescythes.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.taylor.hoesarescythes.HoesAreScythes;
 
 public class ModTags {
@@ -11,7 +11,7 @@ public class ModTags {
         public static final TagKey<Block> SCYTHE_BLOCKS = createTag();
 
         private static TagKey<Block> createTag() {
-            return TagKey.of(RegistryKeys.BLOCK, Identifier.of(HoesAreScythes.MOD_ID, "scythe_blocks"));
+            return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(HoesAreScythes.MOD_ID, "scythe_blocks"));
         }
     }
 }

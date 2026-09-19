@@ -1,12 +1,12 @@
 package net.taylor.hoesarescythes.logic;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.taylor.hoesarescythes.config.ConfigManager;
 import net.taylor.hoesarescythes.config.ModConfig;
 
@@ -52,15 +52,15 @@ public final class RadiusResolver {
     }
 
     private static boolean idEquals(Item item, String idStr) {
-        Identifier id = Identifier.tryParse(idStr);
-        return id != null && Registries.ITEM.getId(item).equals(id);
+        ResourceLocation id = ResourceLocation.tryParse(idStr);
+        return id != null && BuiltInRegistries.ITEM.getKey(item).equals(id);
     }
 
     private static boolean isInItemTag(ItemStack stack, String tagIdNoHash) {
-        Identifier tagId = Identifier.tryParse(tagIdNoHash);
+        ResourceLocation tagId = ResourceLocation.tryParse(tagIdNoHash);
         if (tagId == null) return false;
-        TagKey<Item> key = TagKey.of(RegistryKeys.ITEM, tagId);
-        return stack.isIn(key);
+        TagKey<Item> key = TagKey.create(Registries.ITEM, tagId);
+        return stack.is(key);
     }
 
     private static int clamp(int r) {
