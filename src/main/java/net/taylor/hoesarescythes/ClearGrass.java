@@ -11,12 +11,20 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.FluidState;
+import net.taylor.hoesarescythes.logic.BreakEffects;
 import net.taylor.hoesarescythes.logic.RadiusResolver;
 import net.taylor.hoesarescythes.logic.ScythePredicate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class ClearGrass {
 
@@ -44,42 +52,60 @@ public final class ClearGrass {
 
     private static boolean breakBlocksInRadius(Player player, ServerLevel world, InteractionHand hand,
                                                BlockPos origin, BlockState initial, ItemStack tool, int radius) {
-        boolean didWork = false;
-
         final boolean targetingCrop = initial.is(BlockTags.CROPS);
         final boolean targetingNetherWart = initial.is(Blocks.NETHER_WART);
         final boolean targetingFullyGrown = isFullyGrownCrop(initial);
 
+        List<BreakEffects.Broken> broken = new ArrayList<>();
         BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 mutable.set(origin.getX() + dx, origin.getY(), origin.getZ() + dz);
-                didWork = tryBreakBlock(
-                        player, world, hand, mutable,
+                BlockState state = world.getBlockState(mutable);
+                if (tryBreakBlock(
+                        player, world, hand, mutable, state,
                         targetingCrop, targetingNetherWart, targetingFullyGrown,
                         tool
-                ) || didWork;
+                )) {
+                    broken.add(new BreakEffects.Broken(mutable.immutable(), state));
+                }
             }
         }
-        return didWork;
+
+        BreakEffects.play(world, origin, broken);
+        return !broken.isEmpty();
     }
 
-    private static boolean tryBreakBlock(Player player, ServerLevel world, InteractionHand hand, BlockPos pos,
+    private static boolean tryBreakBlock(Player player, ServerLevel world, InteractionHand hand, BlockPos pos, BlockState state,
                                          boolean targetingCrop, boolean targetingNetherWart, boolean targetingFullyGrown,
                                          ItemStack tool) {
-        BlockState state = world.getBlockState(pos);
         if (state.isAir()) return false;
         if (!player.getAbilities().mayBuild) return false;
         if (world.getServer().isUnderSpawnProtection(world, pos, player)) return false;
         if (!shouldBreakBlock(targetingCrop, targetingFullyGrown, targetingNetherWart, state)) return false;
 
-        boolean broke = world.destroyBlock(pos, !player.getAbilities().instabuild);
+        boolean broke = breakQuietly(world, pos, state, player, tool, !player.getAbilities().instabuild);
         if (!broke) return false;
 
         if (!player.getAbilities().instabuild && tool.isDamageableItem()) {
             tool.hurtAndBreak(1, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
         }
         return true;
+    }
+
+    // Same steps as Level.destroyBlock, minus its per-block break sound and particles (BreakEffects handles those),
+    // and with the hoe passed as the tool so enchantments like Fortune affect the drops.
+    private static boolean breakQuietly(ServerLevel world, BlockPos pos, BlockState state, Player player, ItemStack tool, boolean drop) {
+        FluidState fluid = world.getFluidState(pos);
+        if (drop) {
+            BlockEntity blockEntity = state.hasBlockEntity() ? world.getBlockEntity(pos) : null;
+            Block.dropResources(state, world, pos, blockEntity, player, tool);
+        }
+        boolean removed = world.setBlock(pos, fluid.createLegacyBlock(), Block.UPDATE_ALL);
+        if (removed) {
+            world.gameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Context.of(player, state));
+        }
+        return removed;
     }
 
     private static boolean isValidInitialTarget(BlockState state) {
